@@ -5,7 +5,7 @@ const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const secret = "sarthaksamarthsahilabhi";
-const fetchuser=require('../Middleware/fetchuser');
+const fetchuser = require('../Middleware/fetchuser');
 
 //ROUTE 1:Create a user using: POST "/api/auth/"
 router.post('/createuser', [
@@ -93,7 +93,7 @@ router.post('/getuser', fetchuser, async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
   try {
-    userID=req.user.id;
+    userID = req.user.id;
     const user = await User.findById(userID).select("-password")
     res.send(user);
   } catch (error) {
@@ -101,4 +101,4 @@ router.post('/getuser', fetchuser, async (req, res) => {
     res.status(500).send("Internal server error");
   }
 })
-  module.exports = router;
+module.exports = router;
