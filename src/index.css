@@ -11,3 +11,13 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+i{
+  cursor: pointer;
+  transition: all 0.1s ease-in-out;
+}
+i:hover{
+  color:rgb(15, 91, 204);
+  transform: scale(1.2);
+  /* cursor: pointer; */
+}
