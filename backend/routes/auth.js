@@ -11,24 +11,28 @@ const fetchuser = require("../Middleware/fetchuser");
 router.post(
   "/createuser",
   [
+    body("name", "Enter a valid name").isLength({ min: 3 }),
     body("email", "Enter a valid email").isEmail(),
-    body("name", "Enter a valid name").isLength({ min: 4 }),
     body("password", "Enter a valid password").isLength({ min: 5 }),
   ],
   async (req, res) => {
+    let success = false;
     //  if there are errors return them and bad request
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      // success = false;
+
+      return res.status(400).json({ success, errors: errors.array() });
     }
     // check whether a user with same credentials already exists
     try {
       let user = await User.findOne({ email: req.body.email });
       // console.log(user);
       if (user) {
+        // success = false;
         return res
           .status(400)
-          .json({ error: "Sorry a user with same credentials already exists" });
+          .json({ success, error: "Sorry a user with same credentials already exists" });
       }
       const salt = await bcrypt.genSaltSync(10);
       let securedPass = await bcrypt.hash(req.body.password, salt);
@@ -43,7 +47,8 @@ router.post(
         },
       };
       const AuthToken = jwt.sign(data, secret);
-      res.json({ Authtoken: AuthToken });
+      success = true;
+      res.json({ success, AuthToken });
     } catch (error) {
       console.error(error.message);
       res.status(500).send("Internal server error");
@@ -60,6 +65,7 @@ router.post(
     body("password", "password cannot be blank").exists(),
   ],
   async (req, res) => {
+    let success = true;
     //  if there are errors return them and bad request
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -71,16 +77,19 @@ router.post(
       let user = await User.findOne({ email });
       // console.log(user);
       if (!user) {
+        success = false;
+
         return res
           .status(400)
-          .json({ error: "Please login with correct credentials" });
+          .json({ success, error: "Please login with correct credentials" });
       }
       const passwordCompare = await bcrypt.compare(password, user.password);
 
       if (!passwordCompare) {
+        success = false;
         return res
           .status(400)
-          .json({ error: "Please login with correct credentials" });
+          .json({ success, error: "Please login with correct credentials" });
       }
       const data = {
         user: {
@@ -88,7 +97,7 @@ router.post(
         },
       };
       const AuthToken = jwt.sign(data, secret);
-      res.json({ Authtoken: AuthToken });
+      res.json({ success, AuthToken });
       // console.log(AuthToken);
     } catch (error) {
       console.error(error.message);
@@ -101,13 +110,14 @@ router.post(
 router.post("/getuser", fetchuser, async (req, res) => {
   //  if there are errors return them and bad request
   const errors = validationResult(req);
+  let success = true;
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
   try {
-    userID = req.user.id;
+    let userID = req.user.id;
     const user = await User.findById(userID).select("-password");
-    res.send(user);
+    res.send(user, success);
   } catch (error) {
     console.error(error.message);
     res.status(500).send("Internal server error");
