@@ -10,7 +10,7 @@ const NoteItem = (props) => {
     // let date=note.date.toGMTstring();
     // console.log(date);
     return (
-        <div className="card-deck col-md-3 my-4">
+        <div className="card-deck col-md-3 my-4" style={{"border":"30px solid red"}}>
             <div className="card">
                 {/* <img className="card-img-top" src="..." alt="Card image cap" /> */}
                 <div className="card-body">
